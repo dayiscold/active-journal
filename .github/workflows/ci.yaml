@@ -5,6 +5,16 @@ on:
     branches: ["dev", "main"]
   pull_request:
     branches: ["dev"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment for manual deploy'
+        required: false
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
 
 jobs:
   laravel_tests:
@@ -38,10 +48,10 @@ jobs:
           php-version: "8.4"
           extensions: mbstring, pdo, pdo_mysql, mysql, redis, zip, bcmath
 
-      - name: Copy .env
+      - name: copy .env
         run: cp .env.example .env
 
-      - name: Load dependencies
+      - name: load dependencies
         run: composer install --no-progress --prefer-dist --no-interaction
 
       - name: generate key
@@ -56,7 +66,7 @@ jobs:
           DB_USERNAME: root
           DB_PASSWORD: root
 
-      - name: Testing
+      - name: testing
         run: php artisan test
         env:
           DB_HOST: 127.0.0.1
@@ -65,10 +75,81 @@ jobs:
           DB_USERNAME: root
           DB_PASSWORD: root
 
-  docker_build:
+  docker_staging:
     runs-on: ubuntu-22.04
     needs: laravel_tests
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/dev' || github.event.inputs.environment == 'staging'
+
+    defaults:
+      run:
+        working-directory: ./active-student
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Set tag
+        id: tag
+        run: |
+          if [[ "${{ github.event.inputs.environment }}" == "staging" ]] || [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "tag=staging" >> $GITHUB_OUTPUT
+          else
+            echo "tag=dev-latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/student-activity:${{ steps.tag.outputs.tag }} -f Dockerfile .
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/student-activity:${{ steps.tag.outputs.tag }}
+
+  docker_production:
+    runs-on: ubuntu-22.04
+    needs: laravel_tests
+    if: github.ref == 'refs/heads/main' || github.event.inputs.environment == 'production'
+
+    defaults:
+      run:
+        working-directory: ./active-student
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Set tags
+        id: tags
+        run: |
+          echo "latest_tag=${{ secrets.DOCKER_USERNAME }}/student-activity:latest" >> $GITHUB_OUTPUT
+          echo "commit_tag=${{ secrets.DOCKER_USERNAME }}/student-activity:${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "version_tag=${{ secrets.DOCKER_USERNAME }}/student-activity:${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ steps.tags.outputs.latest_tag }} \
+                       -t ${{ steps.tags.outputs.commit_tag }} \
+                       -f Dockerfile .
+
+      - name: Push Docker images
+        run: |
+          docker push ${{ steps.tags.outputs.latest_tag }}
+          docker push ${{ steps.tags.outputs.commit_tag }}
+
+  docker_build_manual:
+    runs-on: ubuntu-22.04
+    needs: laravel_tests
+    if: github.event_name == 'workflow_dispatch'
 
     defaults:
       run:
@@ -85,7 +166,14 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Build Docker image
-        run: docker build -t coldayyy/student-activity:latest -f Dockerfile .
-
-      - name: Push Docker image
-        run: docker push coldayyy/student-activity:latest
+        run: |
+          if [[ "${{ github.event.inputs.environment }}" == "production" ]]; then
+            docker build -t ${{ secrets.DOCKER_USERNAME }}/student-activity:manual-prod \
+                         -t ${{ secrets.DOCKER_USERNAME }}/student-activity:${{ github.sha }} \
+                         -f Dockerfile .
+            docker push ${{ secrets.DOCKER_USERNAME }}/student-activity:manual-prod
+            docker push ${{ secrets.DOCKER_USERNAME }}/student-activity:${{ github.sha }}
+          else
+            docker build -t ${{ secrets.DOCKER_USERNAME }}/student-activity:manual-staging -f Dockerfile .
+            docker push ${{ secrets.DOCKER_USERNAME }}/student-activity:manual-staging
+          fi
