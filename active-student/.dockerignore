@@ -1,0 +1,16 @@
+.git
+.github
+.gitignore
+.env
+.env.*
+*.md
+*.log
+node_modules
+vendor
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+storage/logs
+.phpunit.cache
+.idea
+.vscode
