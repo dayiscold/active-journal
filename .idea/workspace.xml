@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e29e62d1-53d2-4341-9691-fcf9f037b7fd" name="Changes" comment="" />
+    <list default="true" id="e29e62d1-53d2-4341-9691-fcf9f037b7fd" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/laravel-idea.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/laravel-idea.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/active-student/database/migrations/0001_01_01_000000_create_users_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/active-student/database/migrations/0001_01_01_000001_create_users_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/active-student/database/migrations/2026_03_18_154157_create_import_logs_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/active-student/database/migrations/0001_01_01_000006_create_import_logs_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/active-student/database/migrations/2026_03_21_171910_create_activity_logs_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/active-student/database/migrations/2026_03_21_173959_create_groups_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/active-student/database/migrations/0001_01_01_000000_create_groups_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/active-student/database/migrations/2026_03_21_174005_create_disciplines_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/active-student/database/migrations/0001_01_01_000003_create_group_discipline_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/active-student/database/migrations/2026_03_21_174012_create_group_discipline_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/active-student/database/migrations/2026_03_21_174018_create_lessons_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/active-student/database/migrations/0001_01_01_000004_create_lessons_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/active-student/database/migrations/2026_03_21_174024_create_attendance_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/active-student/database/migrations/0001_01_01_000005_create_attendance_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/active-student/database/migrations/2026_03_21_174031_create_import_logs_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/active-student/database/migrations/2026_03_21_175134_create_personal_access_tokens_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/active-student/database/migrations/2026_03_21_175625_add_role_to_users_table.php" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -216,6 +230,7 @@
       <workItem from="1774323231421" duration="4842000" />
       <workItem from="1774338932559" duration="1873000" />
       <workItem from="1774360757632" duration="7973000" />
+      <workItem from="1774370382253" duration="668000" />
     </task>
     <servers />
   </component>
