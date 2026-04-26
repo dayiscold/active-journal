@@ -8,9 +8,9 @@ use App\Http\Controllers\DisciplineController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\ImportController;
 
 Route::get('/', fn() => view('welcome'))->name('home');
 
@@ -20,6 +20,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::patch('/user/theme', [ProfileController::class, 'updateTheme'])->name('user.theme');
 
     // Admin
     Route::prefix('admin')->middleware('role:admin')->name('admin.')->group(function () {
@@ -33,8 +34,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('lessons', LessonController::class)->except(['show', 'edit', 'update']);
         Route::get('attendance/{lesson}', [AttendanceController::class, 'edit'])->name('attendance.edit');
         Route::put('attendance/{lesson}', [AttendanceController::class, 'update'])->name('attendance.update');
-        Route::get('import', [ImportController::class, 'index'])->name('import.index');
-        Route::post('import', [ImportController::class, 'store'])->name('import.store');
+        Route::post('attendance/{lesson}/import-csv', [AttendanceController::class, 'importCsv'])->name('attendance.importCsv');
     });
 
     // Student

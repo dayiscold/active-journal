@@ -1,53 +1,73 @@
 @extends('layouts.app')
-
 @section('title', $group->exists ? 'Редактировать группу' : 'Новая группа')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>
-            <i class="fas fa-users me-2"></i>
-            {{ $group->exists ? 'Редактировать группу' : 'Новая группа' }}
-        </h2>
-        <a href="{{ route('admin.groups.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Назад
-        </a>
-    </div>
 
-    <div class="card" style="max-width:500px">
-        <div class="card-body">
-            <form method="POST"
-                  action="{{ $group->exists ? route('admin.groups.update', $group) : route('admin.groups.store') }}">
-                @csrf
-                @if($group->exists) @method('PUT') @endif
+<div class="flex items-center justify-between mb-8">
+    <h1 class="text-2xl font-bold text-white">
+        {{ $group->exists ? 'Редактировать группу' : 'Новая группа' }}
+    </h1>
+    <a href="{{ route('admin.groups.index') }}" class="btn-secondary">
+        <i class="fas fa-arrow-left"></i> Назад
+    </a>
+</div>
 
-                <div class="mb-3">
-                    <label class="form-label">Название группы <span class="text-danger">*</span></label>
-                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                           value="{{ old('name', $group->name) }}" placeholder="ИС-101">
-                    @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+<div class="max-w-md">
+    <div class="glass-card p-6">
+        <form method="POST"
+              action="{{ $group->exists ? route('admin.groups.update', $group) : route('admin.groups.store') }}">
+            @csrf
+            @if($group->exists) @method('PUT') @endif
+
+            <div class="space-y-5">
+
+                <div>
+                    <label for="name" class="label-text">
+                        Название группы <span class="text-rose-400">*</span>
+                    </label>
+                    <input type="text" id="name" name="name"
+                           value="{{ old('name', $group->name) }}"
+                           class="input-glass @error('name') error @enderror"
+                           placeholder="ИС-101">
+                    @error('name')<p class="mt-1.5 text-xs text-rose-400">{{ $message }}</p>@enderror
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Факультет <span class="text-danger">*</span></label>
-                    <input type="text" name="faculty" class="form-control @error('faculty') is-invalid @enderror"
-                           value="{{ old('faculty', $group->faculty) }}" placeholder="Факультет информационных технологий">
-                    @error('faculty')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                <div>
+                    <label for="faculty" class="label-text">
+                        Факультет <span class="text-rose-400">*</span>
+                    </label>
+                    <input type="text" id="faculty" name="faculty"
+                           value="{{ old('faculty', $group->faculty) }}"
+                           class="input-glass @error('faculty') error @enderror"
+                           placeholder="Факультет информационных технологий">
+                    @error('faculty')<p class="mt-1.5 text-xs text-rose-400">{{ $message }}</p>@enderror
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Курс <span class="text-danger">*</span></label>
-                    <select name="course" class="form-select @error('course') is-invalid @enderror">
+                <div>
+                    <label for="course" class="label-text">
+                        Курс <span class="text-rose-400">*</span>
+                    </label>
+                    <select id="course" name="course"
+                            class="select-glass @error('course') error @enderror">
                         @for($i = 1; $i <= 6; $i++)
-                            <option value="{{ $i }}" {{ old('course', $group->course) == $i ? 'selected' : '' }}>{{ $i }} курс</option>
+                            <option value="{{ $i }}" {{ old('course', $group->course) == $i ? 'selected' : '' }}>
+                                {{ $i }} курс
+                            </option>
                         @endfor
                     </select>
-                    @error('course')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    @error('course')<p class="mt-1.5 text-xs text-rose-400">{{ $message }}</p>@enderror
                 </div>
 
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save me-2"></i>{{ $group->exists ? 'Сохранить' : 'Создать' }}
-                </button>
-            </form>
-        </div>
+                <div class="pt-2">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i>
+                        {{ $group->exists ? 'Сохранить изменения' : 'Создать группу' }}
+                    </button>
+                </div>
+
+            </div>
+        </form>
     </div>
+</div>
+
 @endsection

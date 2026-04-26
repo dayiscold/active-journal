@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\User;
-use App\Models\Group;
 use App\Models\Discipline;
+use App\Models\Group;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
@@ -14,65 +14,30 @@ class DatabaseSeeder extends Seeder
     {
         $group = Group::firstOrCreate(
             ['name' => 'ИС-101'],
-            [
-                'name' => 'ИС-101',
-                'course' => '1',
-                'faculty' => 'Информационных технологий'
-            ]
+            ['course' => '1', 'faculty' => 'Информационных технологий']
         );
 
         User::updateOrCreate(
             ['email' => 'admin@example.com'],
             [
-                'name' => 'Администратор',
+                'name'     => 'Администратор',
                 'password' => Hash::make('password'),
-                'role' => 'admin'
-            ]
-        );
-
-        User::updateOrCreate(
-            ['email' => 'teacher@example.com'],
-            [
-                'name' => 'Иванов Иван Иванович',
-                'password' => Hash::make('password'),
-                'role' => 'teacher'
-            ]
-        );
-
-        User::updateOrCreate(
-            ['email' => 'student@example.com'],
-            [
-                'name' => 'Петров Петр Петрович',
-                'password' => Hash::make('password'),
-                'role' => 'student',
-                'group_id' => $group->id,
-                'student_id' => 'ST001'
+                'role'     => 'admin',
             ]
         );
 
         User::updateOrCreate(
             ['email' => 'dean@example.com'],
             [
-                'name' => 'Учебная часть',
+                'name'     => 'Учебная часть',
                 'password' => Hash::make('password'),
-                'role' => 'dean'
+                'role'     => 'dean',
             ]
         );
 
-        Discipline::firstOrCreate(
-            ['code' => 'ВМ-101'],
-            [
-                'name' => 'Высшая математика',
-                'code' => 'MATH101'
-            ]
-        );
+        Discipline::firstOrCreate(['code' => 'MATH101'], ['name' => 'Высшая математика']);
+        Discipline::firstOrCreate(['code' => 'PROG101'], ['name' => 'Программирование']);
 
-        Discipline::firstOrCreate(
-            ['code' => 'П-15'],
-            [
-                'name' => 'Программирование',
-                'code' => 'PROG101'
-            ]
-        );
+        $this->call(TestDataSeeder::class);
     }
 }

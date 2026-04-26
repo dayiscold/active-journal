@@ -1,66 +1,73 @@
 @extends('layouts.app')
-
 @section('title', 'Отчёты')
 
 @section('content')
-    <h2 class="mb-4"><i class="fas fa-chart-bar me-2"></i>Отчёты по посещаемости</h2>
 
-    <div class="row g-4">
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>Отчёт по группе</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted">Статистика посещаемости всех студентов группы за выбранный период.</p>
-                    <form method="GET" action="#">
-                        <div class="mb-3">
-                            <label class="form-label">Группа</label>
-                            <select name="group_id" id="groupSelect" class="form-select" onchange="goToGroupReport(this)">
-                                <option value="">— Выберите группу —</option>
-                                @foreach($groups as $group)
-                                    <option value="{{ route('reports.group', $group) }}">
-                                        {{ $group->name }} — {{ $group->faculty }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </form>
-                </div>
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-white">Отчёты по посещаемости</h1>
+    <p class="text-sm text-white/40 mt-0.5">Выберите тип отчёта для просмотра статистики</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    {{-- Group report --}}
+    <div class="glass-card p-6" x-data>
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center shrink-0">
+                <i class="fas fa-users text-teal-400"></i>
+            </div>
+            <div>
+                <h2 class="font-semibold text-white">Отчёт по группе</h2>
+                <p class="text-xs text-white/40">Посещаемость всех студентов группы</p>
             </div>
         </div>
-
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Отчёт по студенту</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted">Личная статистика посещаемости по всем дисциплинам.</p>
-                    <div class="mb-3">
-                        <label class="form-label">Студент</label>
-                        <select class="form-select" onchange="goToStudentReport(this)">
-                            <option value="">— Выберите студента —</option>
-                            @foreach($students as $student)
-                                <option value="{{ route('reports.student', $student) }}">
-                                    {{ $student->name }} — {{ $student->group?->name ?? 'Без группы' }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-            </div>
+        <div>
+            <label for="groupSelect" class="label-text">
+                Выберите группу
+            </label>
+            <select id="groupSelect"
+                    class="select-glass"
+                    @change="if($event.target.value) window.location = $event.target.value"
+                    aria-label="Группа для отчёта">
+                <option value="">— Выберите группу —</option>
+                @foreach($groups as $group)
+                    <option value="{{ route('reports.group', $group) }}">
+                        {{ $group->name }} — {{ $group->faculty }}
+                    </option>
+                @endforeach
+            </select>
         </div>
     </div>
 
-    @push('scripts')
-    <script>
-        function goToGroupReport(sel) {
-            if (sel.value) window.location = sel.value;
-        }
-        function goToStudentReport(sel) {
-            if (sel.value) window.location = sel.value;
-        }
-    </script>
-    @endpush
+    {{-- Student report --}}
+    <div class="glass-card p-6" x-data>
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center shrink-0">
+                <i class="fas fa-user-graduate text-violet-400"></i>
+            </div>
+            <div>
+                <h2 class="font-semibold text-white">Отчёт по студенту</h2>
+                <p class="text-xs text-white/40">Личная статистика по всем дисциплинам</p>
+            </div>
+        </div>
+        <div>
+            <label for="studentSelect" class="label-text">
+                Выберите студента
+            </label>
+            <select id="studentSelect"
+                    class="select-glass"
+                    @change="if($event.target.value) window.location = $event.target.value"
+                    aria-label="Студент для отчёта">
+                <option value="">— Выберите студента —</option>
+                @foreach($students as $student)
+                    <option value="{{ route('reports.student', $student) }}">
+                        {{ $student->name }} — {{ $student->group?->name ?? 'Без группы' }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+
+</div>
+
 @endsection

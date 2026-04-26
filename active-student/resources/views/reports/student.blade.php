@@ -1,55 +1,54 @@
 @extends('layouts.app')
-
 @section('title', 'Отчёт: ' . $user->name)
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-user me-2"></i>{{ $user->name }}</h2>
-        <a href="{{ route('reports.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Назад
-        </a>
-    </div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card text-center bg-primary text-white">
-                <div class="card-body">
-                    <h3>{{ $percentage }}%</h3>
-                    <p class="mb-0">Посещаемость</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-success text-white">
-                <div class="card-body">
-                    <h3>{{ $present }}</h3>
-                    <p class="mb-0">Присутствовал</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-danger text-white">
-                <div class="card-body">
-                    <h3>{{ $attendances->where('status', 'absent')->count() }}</h3>
-                    <p class="mb-0">Прогулов</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-info text-white">
-                <div class="card-body">
-                    <h3>{{ $attendances->where('status', 'sick')->count() }}</h3>
-                    <p class="mb-0">По болезни</p>
-                </div>
-            </div>
-        </div>
+<div class="flex items-center justify-between mb-8">
+    <div>
+        <h1 class="text-2xl font-bold text-white">{{ $user->name }}</h1>
+        <p class="text-sm text-white/40 mt-0.5">
+            {{ $user->group?->name ?? 'Без группы' }}
+            @if($user->student_id)
+                · <span class="font-mono">{{ $user->student_id }}</span>
+            @endif
+        </p>
     </div>
+    <a href="{{ route('reports.index') }}" class="btn-secondary">
+        <i class="fas fa-arrow-left"></i> Назад
+    </a>
+</div>
 
-    <div class="card">
-        <div class="card-header"><strong>История посещаемости</strong></div>
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
+{{-- Stats --}}
+<div class="@container mb-8">
+    <div class="grid grid-cols-2 @xl:grid-cols-4 gap-4">
+        <x-stat-card value="{{ $percentage }}%"
+                     label="Общая посещаемость"
+                     icon="fas fa-chart-line"
+                     color="{{ $percentage >= 75 ? 'teal' : ($percentage >= 50 ? 'amber' : 'rose') }}" />
+        <x-stat-card value="{{ $present }}"
+                     label="Присутствовал"
+                     icon="fas fa-check-circle"
+                     color="teal" />
+        <x-stat-card value="{{ $attendances->where('status', 'absent')->count() }}"
+                     label="Прогулов"
+                     icon="fas fa-circle-xmark"
+                     color="rose" />
+        <x-stat-card value="{{ $attendances->where('status', 'sick')->count() }}"
+                     label="По болезни"
+                     icon="fas fa-kit-medical"
+                     color="sky" />
+    </div>
+</div>
+
+{{-- History --}}
+<div class="glass-card overflow-hidden">
+    <div class="glass-card-header">
+        <h2 class="text-sm font-semibold text-white/70">История посещаемости</h2>
+        <span class="badge badge-slate">{{ $attendances->count() }} записей</span>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="tbl">
+            <thead>
                 <tr>
                     <th>Дата</th>
                     <th>Пара</th>
@@ -58,38 +57,25 @@
                     <th>Статус</th>
                     <th>Причина</th>
                 </tr>
-                </thead>
-                <tbody>
-                @forelse($attendances as $att)
-                    @php
-                        $badge = match($att->status) {
-                            'present' => 'success',
-                            'late'    => 'warning',
-                            'absent'  => 'danger',
-                            'sick'    => 'info',
-                            default   => 'secondary',
-                        };
-                        $label = match($att->status) {
-                            'present' => 'Присутствовал',
-                            'late'    => 'Опоздал',
-                            'absent'  => 'Отсутствовал',
-                            'sick'    => 'Болезнь',
-                            default   => $att->status,
-                        };
-                    @endphp
-                    <tr>
-                        <td>{{ optional($att->lesson)->date?->format('d.m.Y') ?? '—' }}</td>
-                        <td>{{ optional($att->lesson)->pair_number ?? '—' }}</td>
-                        <td>{{ optional(optional($att->lesson)->discipline)->name ?? '—' }}</td>
-                        <td>{{ optional(optional($att->lesson)->teacher)->name ?? '—' }}</td>
-                        <td><span class="badge bg-{{ $badge }}">{{ $label }}</span></td>
-                        <td>{{ $att->reason ?? '—' }}</td>
-                    </tr>
-                @empty
-                    <tr><td colspan="6" class="text-center text-muted py-4">Нет данных</td></tr>
-                @endforelse
-                </tbody>
-            </table>
-        </div>
+            </thead>
+            <tbody>
+            @forelse($attendances as $att)
+                <tr>
+                    <td class="whitespace-nowrap">{{ optional($att->lesson)->date?->format('d.m.Y') ?? '—' }}</td>
+                    <td class="text-white/50">{{ optional($att->lesson)->pair_number ?? '—' }}</td>
+                    <td>{{ optional(optional($att->lesson)->discipline)->name ?? '—' }}</td>
+                    <td class="text-white/50">{{ optional(optional($att->lesson)->teacher)->name ?? '—' }}</td>
+                    <td><x-badge :status="$att->status" /></td>
+                    <td class="text-white/50">{{ $att->reason ?? '—' }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="text-center py-12 text-white/30">Нет данных</td>
+                </tr>
+            @endforelse
+            </tbody>
+        </table>
     </div>
+</div>
+
 @endsection

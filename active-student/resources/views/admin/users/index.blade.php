@@ -1,77 +1,80 @@
 @extends('layouts.app')
-
 @section('title', 'Пользователи')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-user-cog me-2"></i>Пользователи</h2>
-        <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Добавить пользователя
-        </a>
-    </div>
 
-    <div class="card">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-dark">
+<div class="flex items-center justify-between mb-8">
+    <h1 class="text-2xl font-bold text-white">Пользователи</h1>
+    <a href="{{ route('admin.users.create') }}" class="btn-primary">
+        <i class="fas fa-plus"></i> Добавить
+    </a>
+</div>
+
+<div class="glass-card overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="tbl">
+            <thead>
                 <tr>
                     <th>#</th>
                     <th>Имя</th>
                     <th>Email</th>
                     <th>Роль</th>
                     <th>Группа</th>
-                    <th>Номер студ. билета</th>
-                    <th>Действия</th>
+                    <th>Студ. билет</th>
+                    <th class="text-right">Действия</th>
                 </tr>
-                </thead>
-                <tbody>
-                @forelse($users as $user)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $user->name }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>
-                            @php
-                                $badge = match($user->role) {
-                                    'admin'   => 'danger',
-                                    'teacher' => 'warning',
-                                    'student' => 'info',
-                                    'dean'    => 'secondary',
-                                    default   => 'light',
-                                };
-                                $label = match($user->role) {
-                                    'admin'   => 'Администратор',
-                                    'teacher' => 'Преподаватель',
-                                    'student' => 'Студент',
-                                    'dean'    => 'Учебная часть',
-                                    default   => $user->role,
-                                };
-                            @endphp
-                            <span class="badge bg-{{ $badge }}">{{ $label }}</span>
-                        </td>
-                        <td>{{ $user->group?->name ?? '—' }}</td>
-                        <td>{{ $user->student_id ?? '—' }}</td>
-                        <td>
-                            <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-edit"></i>
+            </thead>
+            <tbody>
+            @forelse($users as $user)
+                <tr>
+                    <td class="text-white/30 text-xs">{{ $loop->iteration }}</td>
+                    <td class="font-medium text-white/85">{{ $user->name }}</td>
+                    <td class="text-white/50 text-xs">{{ $user->email }}</td>
+                    <td><x-badge :role="$user->role" /></td>
+                    <td class="text-white/50">{{ $user->group?->name ?? '—' }}</td>
+                    <td class="font-mono text-xs text-white/40">{{ $user->student_id ?? '—' }}</td>
+                    <td>
+                        <div class="flex items-center justify-end gap-1.5">
+                            <a href="{{ route('admin.users.edit', $user) }}"
+                               class="btn-secondary btn-sm btn-icon"
+                               title="Редактировать"
+                               aria-label="Редактировать {{ $user->name }}">
+                                <i class="fas fa-pencil text-xs"></i>
                             </a>
-                            <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="d-inline"
-                                  onsubmit="return confirm('Удалить пользователя {{ $user->name }}?')">
-                                @csrf @method('DELETE')
-                                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
-                            </form>
                             @if($user->role === 'student')
-                                <a href="{{ route('reports.student', $user) }}" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-chart-bar"></i>
-                                </a>
+                            <a href="{{ route('reports.student', $user) }}"
+                               class="btn-amber btn-sm btn-icon"
+                               title="Отчёт"
+                               aria-label="Отчёт {{ $user->name }}">
+                                <i class="fas fa-chart-bar text-xs"></i>
+                            </a>
                             @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr><td colspan="7" class="text-center text-muted py-4">Нет пользователей</td></tr>
-                @endforelse
-                </tbody>
-            </table>
-        </div>
+                            <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
+                                  @submit.prevent="if(confirm('Удалить пользователя {{ addslashes($user->name) }}?')) $el.submit()">
+                                @csrf @method('DELETE')
+                                <button type="submit"
+                                        class="btn-danger btn-sm btn-icon"
+                                        title="Удалить"
+                                        aria-label="Удалить {{ $user->name }}">
+                                    <i class="fas fa-trash text-xs"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="7" class="text-center py-16">
+                        <div class="flex flex-col items-center gap-2 text-white/30">
+                            <i class="fas fa-users text-3xl"></i>
+                            <p>Пользователей пока нет</p>
+                        </div>
+                    </td>
+                </tr>
+            @endforelse
+            </tbody>
+        </table>
     </div>
+</div>
+
 @endsection
