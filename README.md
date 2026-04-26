@@ -1,179 +1,163 @@
-# 🎓 Student Activity (Active Journal)
+<div align="center">
 
-Сервис для учета посещаемости студентов, статистики и управления учебным процессом.
+# Активный студент
 
-## 🚀 Стек технологий
+**Веб-система учёта посещаемости для университетов**
 
-* **Laravel (PHP 8.4)**
-* **MySQL**
-* **Redis**
-* **Nginx**
-* **Docker / Docker Compose**
+[![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?style=flat-square&logo=php&logoColor=white)](https://php.net)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Alpine.js](https://img.shields.io/badge/Alpine.js-3-8BC0D0?style=flat-square&logo=alpine.js&logoColor=white)](https://alpinejs.dev)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
+[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
----
+Система автоматизирует журнал посещаемости: преподаватель отмечает студентов вручную или загружает CSV-выгрузку из Microsoft Teams — всё остальное система делает сама.
 
-## 📦 Возможности
-
-* 📋 Учет посещаемости
-* 📊 Статистика по студентам
-* 📥 Импорт данных
-* 👥 Управление студентами, группами и дисциплинами
+</div>
 
 ---
 
-## ⚠️ В разработке
+## Возможности
 
-* 🔐 Аутентификация (Auth) — требуется доработка
-* 🗄️ Структура базы данных — возможны изменения
-* 📊 Расширенная аналитика
+- **4 роли** — Администратор, Преподаватель, Студент, Учебная часть с разграниченным доступом
+- **Ручная отметка** — удобный сегментированный контрол прямо в таблице группы
+- **Импорт из Teams** — загрузите CSV, система сопоставит email и проставит статусы автоматически
+- **Умное определение опоздания** — по времени входа (+15 мин) и длительности присутствия (< 75 мин)
+- **Отчёты** — по студенту, по группе, по дисциплине; прогресс-бары и процент посещаемости
+- **Тёмная / светлая тема** — переключается в один клик, сохраняется в профиле
+- **Полностью Docker** — поднимается одной командой, без ручной настройки окружения
 
----
+## Стек технологий
 
-## 🐳 Быстрый запуск (Docker)
+| Слой | Технология |
+|------|-----------|
+| Backend | Laravel 13, PHP 8.4-fpm |
+| Frontend | Tailwind CSS v4, Alpine.js 3, Vite 7 |
+| База данных | MySQL 8, Redis (сессии) |
+| Инфраструктура | Docker, nginx |
+| Инструменты | Laravel Pint, Chart.js |
 
-### 1. Клонировать репозиторий
+## Быстрый старт
+
+**Требования:** Docker Desktop, Git.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/active-student.git
-cd active-student
-```
+# 1. Клонировать репозиторий
+git clone https://github.com/dayiscold/active-journal.git
+cd active-journal/active-student
 
----
-
-### 2. Запустить контейнеры
-
-```bash
-docker-compose up -d --build
-```
-
----
-
-### 3. Установить зависимости Laravel
-
-```bash
-docker exec -it active-student-app composer install
-```
-
----
-
-### 4. Настроить `.env`
-
-```bash
+# 2. Скопировать конфиг окружения
 cp .env.example .env
+
+# 3. Поднять контейнеры
+docker compose up -d
+
+# 4. Установить зависимости и подготовить БД
+docker compose exec app composer install
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate
+docker compose exec app php artisan db:seed
+
+# 5. Собрать фронтенд
+docker compose exec app npm install
+docker compose exec app npm run build
 ```
 
-Отредактировать `.env`:
+Приложение доступно на **http://localhost**
+
+| Сервис | Адрес |
+|--------|-------|
+| Приложение | http://localhost |
+| phpMyAdmin | http://localhost:8080 |
+
+### Тестовые учётные записи
+
+| Роль | Email | Пароль |
+|------|-------|--------|
+| Администратор | admin@example.com | password |
+| Преподаватель | teacher@example.com | password |
+| Студент | student@example.com | password |
+| Учебная часть | dean@example.com | password |
+
+## Структура проекта
 
 ```
-DB_CONNECTION=mysql
-DB_HOST=mysql
-DB_PORT=3306
-DB_DATABASE=attendance_db
-DB_USERNAME=attendance_user
-DB_PASSWORD=attendance_password
-
-REDIS_HOST=redis
-REDIS_PORT=6379
+active-student/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/        # AuthController, AttendanceController, ReportController...
+│   │   └── Middleware/         # CheckRole — ролевой доступ
+│   └── Models/                 # User, Group, Discipline, Lesson, Attendance
+├── database/
+│   ├── migrations/             # Схема БД
+│   └── seeders/                # Тестовые данные
+├── resources/
+│   ├── css/app.css             # Tailwind + CSS-переменные тем
+│   ├── js/app.js               # Alpine.js, themeToggle
+│   └── views/
+│       ├── admin/              # CRUD: группы, дисциплины, пользователи
+│       ├── teacher/            # Занятия, отметка посещаемости, импорт CSV
+│       ├── student/            # Личный дашборд с Chart.js
+│       ├── reports/            # Отчёты (группа, студент)
+│       ├── layouts/app.blade.php
+│       └── components/         # stat-card, badge, glass-card
+└── routes/web.php
 ```
 
----
+## Схема данных
 
-### 5. Сгенерировать ключ приложения
+```
+users ──────────┐
+ role: admin    │ group_id
+       teacher  ├──► groups ◄──────── group_discipline ──► disciplines
+       student  │                           │ teacher_id
+       dean     │                           ▼
+                │                        lessons
+                │                           │ lesson_id
+                └───────────────────► attendance
+                                       status: present / late / absent / sick
+```
+
+## Роли и доступ
+
+| Раздел | admin | teacher | student | dean |
+|--------|:-----:|:-------:|:-------:|:----:|
+| Управление группами | ✓ | — | — | — |
+| Управление дисциплинами | ✓ | — | — | — |
+| Управление пользователями | ✓ | — | — | — |
+| Создание занятий | — | ✓ | — | — |
+| Отметка посещаемости | — | ✓ | — | — |
+| Импорт из Teams | — | ✓ | — | — |
+| Отчёты | ✓ | ✓ | — | ✓ |
+| Личная статистика | — | — | ✓ | — |
+
+## Импорт из Microsoft Teams
+
+1. В Teams → **Участники** → **Скачать список участников** (`.csv`)
+2. На странице занятия нажмите **Импорт из Teams CSV** и загрузите файл
+3. Система автоматически:
+   - Сопоставит email из CSV с базой данных (поле `teams_email` или `email`)
+   - Отметит студентов **присутствующими**, **опоздавшими** или **отсутствующими**
+
+**Критерии опоздания:** вход позже 15 минут от начала пары ИЛИ суммарное время в звонке менее 75 минут.
+
+## Разработка
 
 ```bash
-docker exec -it active-student-app php artisan key:generate
+# Горячая перезагрузка фронтенда
+docker compose exec app npm run dev
+
+# Запуск тестов
+docker compose exec app php artisan test
+
+# Форматирование кода (Laravel Pint)
+docker compose exec app ./vendor/bin/pint
 ```
 
 ---
 
-### 6. Применить миграции
+## Авторы
 
-```bash
-docker exec -it active-student-app php artisan migrate
-```
+Учебный проект — Асатулин В.А., Геребен Я.В., Птухин Т.И.
 
----
-
-## 🌐 Доступ к сервисам
-
-| Сервис      | URL                   |
-| ----------- | --------------------- |
-| Laravel App | http://localhost      |
-| phpMyAdmin  | http://localhost:8080 |
-| MySQL       | localhost:3308        |
-| Redis       | localhost:6380        |
-
----
-
-## 🐳 Docker Hub
-
-Образ приложения:
-
-```
-coldayyy/student-activity:latest
-```
-
----
-
-## 📁 Структура проекта
-
-```
-app/
- ├── Http/Controllers
- ├── Models
- ├── Middleware
-
-database/
- ├── factories
- ├── migrations
- ├── seeders
-
-resources/
- ├── views
- ├── js
- ├── css
-
-routes/
- ├── web.php
- ├── api.php
- 
- 
-```
-
-
-## 🤝 Сontributors
-
-1. Сделать fork репозитория
-2. Создать ветку:
-
-   ```bash
-   git checkout -b feature/your-feature
-   ```
-3. Сделать изменения и commit:
-
-   ```bash
-   git commit -m "feat: add new feature"
-   ```
-4. Запушить ветку:
-
-   ```bash
-   git push origin feature/your-feature
-   ```
-5. Создать Pull Request 🚀
-
----
-
-## 🧠 Рекомендации разработчикам
-
-* Использовать отдельные контроллеры (например `AttendanceController`)
-* Следовать REST API подходу
-* Проверять данные через Request validation
-
----
-
-## 📌 TODO
-
-* [ ] Реализовать полноценный Auth (JWT / Sanctum)
-* [ ] Добавить роли пользователей (Admin / Teacher / Student)
-* [ ] Оптимизировать запросы к БД
-
+Распространяется под лицензией [MIT](LICENSE).
