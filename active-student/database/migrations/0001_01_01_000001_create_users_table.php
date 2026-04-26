@@ -15,7 +15,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['admin', 'teacher', 'student', 'dean'])->default('student');
-            $table->foreignId('group_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('group_id')->nullable()->constrained('groups')->nullOnDelete();
             $table->string('teams_email')->nullable();
             $table->string('student_id')->nullable()->unique();
             $table->rememberToken();

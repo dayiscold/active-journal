@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use App\Models\Group;
 use App\Models\Discipline;
+use App\Models\Group;
 use App\Models\Lesson;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -15,17 +14,17 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        $totalStudents = User::where('role', 'student')->count();
-        $totalGroups = Group::count();
+        if ($user->isStudent()) {
+            return app(StudentController::class)->dashboard();
+        }
+
+        $totalStudents    = User::where('role', 'student')->count();
+        $totalGroups      = Group::count();
         $totalDisciplines = Discipline::count();
-        $todayLessons = Lesson::whereDate('date', today())->count();
+        $todayLessons     = Lesson::whereDate('date', today())->count();
 
         return view('dashboard.index', compact(
-            'user',
-            'totalStudents',
-            'totalGroups',
-            'totalDisciplines',
-            'todayLessons'
+            'user', 'totalStudents', 'totalGroups', 'totalDisciplines', 'todayLessons'
         ));
     }
 }

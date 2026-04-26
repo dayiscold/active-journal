@@ -1,58 +1,163 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Активный студент
 
-## About Laravel
+**Веб-система учёта посещаемости для университетов**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+[![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?style=flat-square&logo=php&logoColor=white)](https://php.net)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Alpine.js](https://img.shields.io/badge/Alpine.js-3-8BC0D0?style=flat-square&logo=alpine.js&logoColor=white)](https://alpinejs.dev)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
+[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Система автоматизирует журнал посещаемости: преподаватель отмечает студентов вручную или загружает CSV-выгрузку из Microsoft Teams — всё остальное система делает сама.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+</div>
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Возможности
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **4 роли** — Администратор, Преподаватель, Студент, Учебная часть с разграниченным доступом
+- **Ручная отметка** — удобный сегментированный контрол прямо в таблице группы
+- **Импорт из Teams** — загрузите CSV, система сопоставит email и проставит статусы автоматически
+- **Умное определение опоздания** — по времени входа (+15 мин) и длительности присутствия (< 75 мин)
+- **Отчёты** — по студенту, по группе, по дисциплине; прогресс-бары и процент посещаемости
+- **Тёмная / светлая тема** — переключается в один клик, сохраняется в профиле
+- **Полностью Docker** — поднимается одной командой, без ручной настройки окружения
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Стек технологий
 
-## Agentic Development
+| Слой | Технология |
+|------|-----------|
+| Backend | Laravel 13, PHP 8.4-fpm |
+| Frontend | Tailwind CSS v4, Alpine.js 3, Vite 7 |
+| База данных | MySQL 8, Redis (сессии) |
+| Инфраструктура | Docker, nginx |
+| Инструменты | Laravel Pint, Chart.js |
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Быстрый старт
+
+**Требования:** Docker Desktop, Git.
 
 ```bash
-composer require laravel/boost --dev
+# 1. Клонировать репозиторий
+git clone https://github.com/dayiscold/active-journal.git
+cd active-journal/active-student
 
-php artisan boost:install
+# 2. Скопировать конфиг окружения
+cp .env.example .env
+
+# 3. Поднять контейнеры
+docker compose up -d
+
+# 4. Установить зависимости и подготовить БД
+docker compose exec app composer install
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate
+docker compose exec app php artisan db:seed
+
+# 5. Собрать фронтенд
+docker compose exec app npm install
+docker compose exec app npm run build
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Приложение доступно на **http://localhost**
 
-## Contributing
+| Сервис | Адрес |
+|--------|-------|
+| Приложение | http://localhost |
+| phpMyAdmin | http://localhost:8080 |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Тестовые учётные записи
 
-## Code of Conduct
+| Роль | Email | Пароль |
+|------|-------|--------|
+| Администратор | admin@example.com | password |
+| Преподаватель | teacher@example.com | password |
+| Студент | student@example.com | password |
+| Учебная часть | dean@example.com | password |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Структура проекта
 
-## Security Vulnerabilities
+```
+active-student/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/        # AuthController, AttendanceController, ReportController...
+│   │   └── Middleware/         # CheckRole — ролевой доступ
+│   └── Models/                 # User, Group, Discipline, Lesson, Attendance
+├── database/
+│   ├── migrations/             # Схема БД
+│   └── seeders/                # Тестовые данные
+├── resources/
+│   ├── css/app.css             # Tailwind + CSS-переменные тем
+│   ├── js/app.js               # Alpine.js, themeToggle
+│   └── views/
+│       ├── admin/              # CRUD: группы, дисциплины, пользователи
+│       ├── teacher/            # Занятия, отметка посещаемости, импорт CSV
+│       ├── student/            # Личный дашборд с Chart.js
+│       ├── reports/            # Отчёты (группа, студент)
+│       ├── layouts/app.blade.php
+│       └── components/         # stat-card, badge, glass-card
+└── routes/web.php
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Схема данных
 
-## License
+```
+users ──────────┐
+ role: admin    │ group_id
+       teacher  ├──► groups ◄──────── group_discipline ──► disciplines
+       student  │                           │ teacher_id
+       dean     │                           ▼
+                │                        lessons
+                │                           │ lesson_id
+                └───────────────────► attendance
+                                       status: present / late / absent / sick
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Роли и доступ
+
+| Раздел | admin | teacher | student | dean |
+|--------|:-----:|:-------:|:-------:|:----:|
+| Управление группами | ✓ | — | — | — |
+| Управление дисциплинами | ✓ | — | — | — |
+| Управление пользователями | ✓ | — | — | — |
+| Создание занятий | — | ✓ | — | — |
+| Отметка посещаемости | — | ✓ | — | — |
+| Импорт из Teams | — | ✓ | — | — |
+| Отчёты | ✓ | ✓ | — | ✓ |
+| Личная статистика | — | — | ✓ | — |
+
+## Импорт из Microsoft Teams
+
+1. В Teams → **Участники** → **Скачать список участников** (`.csv`)
+2. На странице занятия нажмите **Импорт из Teams CSV** и загрузите файл
+3. Система автоматически:
+   - Сопоставит email из CSV с базой данных (поле `teams_email` или `email`)
+   - Отметит студентов **присутствующими**, **опоздавшими** или **отсутствующими**
+
+**Критерии опоздания:** вход позже 15 минут от начала пары ИЛИ суммарное время в звонке менее 75 минут.
+
+## Разработка
+
+```bash
+# Горячая перезагрузка фронтенда
+docker compose exec app npm run dev
+
+# Запуск тестов
+docker compose exec app php artisan test
+
+# Форматирование кода (Laravel Pint)
+docker compose exec app ./vendor/bin/pint
+```
+
+---
+
+## Авторы
+
+Учебный проект — Асатулин В.А., Геребен Я.В., Птухин Т.И.
+
+Распространяется под лицензией [MIT](LICENSE).
