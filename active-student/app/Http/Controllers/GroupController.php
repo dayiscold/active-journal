@@ -9,7 +9,7 @@ class GroupController extends Controller
 {
     public function index()
     {
-        $groups = Group::withCount('students')->orderBy('faculty')->orderBy('course')->get();
+        $groups = Group::withCount('students')->orderBy('faculty')->orderBy('course')->paginate(10);
         return view('admin.groups.index', compact('groups'));
     }
 
