@@ -47,5 +47,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::get('/group/{group}', [ReportController::class, 'byGroup'])->name('group');
         Route::get('/student/{user}', [ReportController::class, 'byStudent'])->name('student');
+        Route::get('/group/{group}/export-excel', [ReportController::class, 'exportGroupExcel'])->name('group.export.excel');
+        Route::get('/student/{user}/export-excel', [ReportController::class, 'exportStudentExcel'])->name('student.export.excel');
     });
 });

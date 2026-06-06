@@ -13,9 +13,14 @@
             @endif
         </p>
     </div>
-    <a href="{{ route('reports.index') }}" class="btn-secondary">
-        <i class="fas fa-arrow-left"></i> Назад
-    </a>
+    <div class="flex gap-2">
+        <a href="{{ route('reports.index') }}" class="btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+        <a href="{{ route('reports.student.export.excel', $user) }}" class="btn-secondary">
+            <i class="fas fa-file-excel"></i> Excel
+        </a>
+    </div>
 </div>
 
 {{-- Stats --}}

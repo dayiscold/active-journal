@@ -9,7 +9,7 @@ class DisciplineController extends Controller
 {
     public function index()
     {
-        $disciplines = Discipline::orderBy('name')->get();
+        $disciplines = Discipline::orderBy('name')->paginate(10);
         return view('admin.disciplines.index', compact('disciplines'));
     }
 

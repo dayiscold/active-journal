@@ -8,9 +8,15 @@
         <h1 class="text-2xl font-bold text-white">Группа {{ $group->name }}</h1>
         <p class="text-sm text-white/40 mt-0.5">{{ $group->faculty }}</p>
     </div>
-    <a href="{{ route('reports.index') }}" class="btn-secondary">
-        <i class="fas fa-arrow-left"></i> Назад
-    </a>
+    <div class="flex gap-2">
+        <a href="{{ route('reports.index') }}" class="btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+        <a href="{{ route('reports.group.export.excel', ['group' => $group, 'date_from' => $dateFrom, 'date_to' => $dateTo]) }}" 
+           class="btn-secondary">
+            <i class="fas fa-file-excel"></i> Excel
+        </a>
+    </div>
 </div>
 
 {{-- Date filter --}}

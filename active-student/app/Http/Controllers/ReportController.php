@@ -8,6 +8,9 @@ use App\Models\Group;
 use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\GroupAttendanceExport;
+use App\Exports\StudentAttendanceExport;
 
 class ReportController extends Controller
 {
@@ -61,5 +64,18 @@ class ReportController extends Controller
         $percentage = $total > 0 ? round(($present / $total) * 100) : 0;
 
         return view('reports.student', compact('user', 'attendances', 'total', 'present', 'percentage'));
+    }
+
+    public function exportGroupExcel(Request $request, Group $group)
+    {
+        $dateFrom = $request->get('date_from', now()->startOfMonth()->format('Y-m-d'));
+        $dateTo   = $request->get('date_to', now()->format('Y-m-d'));
+
+        return Excel::download(new GroupAttendanceExport($group, $dateFrom, $dateTo), 'group-' . $group->name . '.xlsx');
+    }
+
+    public function exportStudentExcel(User $user)
+    {
+        return Excel::download(new StudentAttendanceExport($user), 'student-' . $user->name . '.xlsx');
     }
 }

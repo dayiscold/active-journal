@@ -1,39 +1,41 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Models\Group;
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class UserController extends Controller
+class UserApiController extends Controller
 {
+    // Получить список пользователей (с пагинацией)
     public function index()
     {
         $users = User::with('group')->orderBy('role')->orderBy('name')->paginate(10);
-        return view('admin.users.index', compact('users'));
+        return response()->json($users);
     }
 
-    public function create()
+    // Получить одного пользователя
+    public function show(User $user)
     {
-        $groups = Group::orderBy('name')->get();
-        return view('admin.users.form', ['user' => new User(), 'groups' => $groups]);
+        return response()->json($user->load('group'));
     }
 
+    // Создать пользователя
     public function store(Request $request)
     {
         $request->validate([
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|unique:users',
-            'password'    => 'required|min:8|confirmed',
+            'password'    => 'required|min:8',
             'role'        => 'required|in:admin,teacher,student,dean',
             'group_id'    => 'nullable|exists:groups,id',
             'teams_email' => 'nullable|email',
             'student_id'  => 'nullable|string|max:50|unique:users',
         ]);
 
-        User::create([
+        $user = User::create([
             'name'        => $request->name,
             'email'       => $request->email,
             'password'    => Hash::make($request->password),
@@ -43,21 +45,16 @@ class UserController extends Controller
             'student_id'  => $request->student_id,
         ]);
 
-        return redirect()->route('admin.users.index')->with('success', 'Пользователь успешно создан');
+        return response()->json($user, 201);
     }
 
-    public function edit(User $user)
-    {
-        $groups = Group::orderBy('name')->get();
-        return view('admin.users.form', compact('user', 'groups'));
-    }
-
+    // Обновить пользователя
     public function update(Request $request, User $user)
     {
         $request->validate([
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|unique:users,email,' . $user->id,
-            'password'    => 'nullable|min:8|confirmed',
+            'password'    => 'nullable|min:8',
             'role'        => 'required|in:admin,teacher,student,dean',
             'group_id'    => 'nullable|exists:groups,id',
             'teams_email' => 'nullable|email',
@@ -70,12 +67,13 @@ class UserController extends Controller
         }
         $user->update($data);
 
-        return redirect()->route('admin.users.index')->with('success', 'Пользователь успешно обновлён');
+        return response()->json($user);
     }
 
+    // Удалить пользователя (Soft Delete)
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'Пользователь удалён');
+        return response()->json(['message' => 'Пользователь удалён']);
     }
 }
